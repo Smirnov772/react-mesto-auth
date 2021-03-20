@@ -12,7 +12,7 @@ function PopupWithForm(props) {
           onClick={props.onClose}
         ></button>
         <p className="popup__paragraph">{props.title}</p>
-        {props.children}
+       <form>{props.children}</form> 
       </div>
     </div>
   );

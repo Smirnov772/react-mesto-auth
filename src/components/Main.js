@@ -1,18 +1,18 @@
 // import React, { useEffect } from "react";
 import { useEffect, useState } from "react";
-import api from "../utils/Api";
+import api from "../utils/api";
 import Card from "../components/Card";
 
 function Main(props) {
   const [userInfo, setUserInfo] = useState({
     name: "Жак Ив Кусто",
     about: "Иследователь океана",
+    avatar: "#",
   });
   useEffect(() => {
     api
       .getUserInfo()
       .then((dataUser) => {
-        console.log(dataUser);
         setUserInfo(dataUser);
       })
       .catch((err) => console.log(err));
@@ -20,16 +20,17 @@ function Main(props) {
 
   const [cards, setCards] = useState([]);
   useEffect(() => {
-    api.getAllCards().then((dataCard) => {
-
-      setCards(dataCard);
-    });
+    api
+      .getAllCards()
+      .then((dataCard) => {
+        setCards(dataCard);
+      })
+      .catch((err) => console.log(err));
   }, []);
-  console.log(cards)
-const handleCardClick=(url)=>{
-  props.onCardClick(url)
 
-}
+  const handleCardClick = (url) => {
+    props.onCardClick(url);
+  };
 
   return (
     <main className="content">
@@ -61,14 +62,15 @@ const handleCardClick=(url)=>{
       </section>
 
       <section className="elements">
-        {cards.map((item) => 
-          <Card 
-          name={item.name}
-          likes={item.likes}
-          key={item._id}
-          src={item.link} 
-          gethandleClick={handleCardClick}/>
-        )}
+        {cards.map((item) => (
+          <Card
+            name={item.name}
+            likes={item.likes}
+            key={item._id}
+            src={item.link}
+            handleClick={handleCardClick}
+          />
+        ))}
       </section>
     </main>
   );

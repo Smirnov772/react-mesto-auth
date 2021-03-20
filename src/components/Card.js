@@ -1,24 +1,17 @@
-// import { useEffect, useState } from "react";
-// import api from "../utils/Api";
 import React from "react";
 
 function Card(props) {
-//   const [cards, setCards] = useState([]);
-//   useEffect(() => {
-//     api.getAllCards().then((dataCard) => {
-//       console.log(dataCard);
-//       setCards(dataCard);
-//     });
-//   }, []); 
-// console.log(cards);
-function handleClick() {
-  props.gethandleClick({src:props.src, name:props.name})
-  // props.gethandleClick(props.src);
-}  
+  function handleClick() {
+    props.handleClick({ src: props.src, name: props.name });
+  }
   return (
     <div className="element">
-      <img className={`element__image ${props.card && "popup_active"}`}
-      src={`${props.src}`} alt="Картинка" onClick={handleClick}/>
+      <img
+        className={`element__image ${props.card && "popup_active"}`}
+        src={`${props.src}`}
+        alt="Картинка"
+        onClick={handleClick}
+      />
       <p className="element__paragraph">{props.name}</p>
       <button
         className="element__remove"
