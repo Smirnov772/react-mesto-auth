@@ -81,7 +81,7 @@ class Api {
   } 
 }
 
-const Api = new Api({
+const api = new Api({
   url: "https://mesto.nomoreparties.co/v1",
   cohortId: "cohort-20",
   headers: {
@@ -90,4 +90,4 @@ const Api = new Api({
   },
 });
 
-export default Api
+export default api
