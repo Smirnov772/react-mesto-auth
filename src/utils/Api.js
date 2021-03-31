@@ -6,12 +6,10 @@ const onError = (res) => {
 };
 
 class Api {
-  constructor({ url, cohortId, headers}) {
+  constructor({ url, cohortId, headers }) {
     this._url = url;
     this._cohortId = cohortId;
     this._headers = headers;
-
-   
   }
   getAllCards() {
     return fetch(`${this._url}/${this._cohortId}/cards`, {
@@ -21,7 +19,6 @@ class Api {
   }
 
   addCard(dataCards) {
-    
     return fetch(`${this._url}/${this._cohortId}/cards`, {
       method: "POST",
       headers: this._headers,
@@ -31,7 +28,7 @@ class Api {
       }),
     }).then(onError);
   }
-  
+
   getUserInfo() {
     return fetch(`${this._url}/${this._cohortId}/users/me`, {
       method: "GET",
@@ -51,12 +48,14 @@ class Api {
   }
 
   removeCard(id) {
+    console.log(id)
     return fetch(`${this._url}/${this._cohortId}/cards/${id}`, {
       method: "DELETE",
       headers: this._headers,
     }).then(onError);
   }
   editAvatar(avatarId) {
+    console.log(avatarId)
     return fetch(`${this._url}/${this._cohortId}/users/me/avatar`, {
       method: "PATCH",
       headers: this._headers,
@@ -65,20 +64,27 @@ class Api {
       }),
     }).then(onError);
   }
-  setLike(id){
-    console.log(id)
+  setLike(id) {
+    console.log(id);
     return fetch(`${this._url}/${this._cohortId}/cards/likes/${id}`, {
       method: "PUT",
       headers: this._headers,
     }).then(onError);
-  } 
-  removeLike(id){
-    console.log(id)
+  }
+  removeLike(id) {
+    console.log(id);
     return fetch(`${this._url}/${this._cohortId}/cards/likes/${id}`, {
       method: "DELETE",
       headers: this._headers,
     }).then(onError);
-  } 
+  }
+  changeLikeCardStatus(id, isLiked) {
+    console.log(id, isLiked);
+    return fetch(`${this._url}/${this._cohortId}/cards/likes/${id}`, {
+      method: isLiked ? "PUT" : "DELETE",
+      headers: this._headers,
+    }).then(onError);
+  }
 }
 
 const api = new Api({
@@ -90,4 +96,4 @@ const api = new Api({
   },
 });
 
-export default api
+export default api;
