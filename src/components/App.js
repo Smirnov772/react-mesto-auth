@@ -11,11 +11,7 @@ import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
 
 function App() {
-  const [currentUser, setCurrentUser] = useState({
-    name: "Жак Ив Кусто",
-    about: "Иследователь океана",
-    avatar: "#",
-  });
+  const [currentUser, setCurrentUser] = useState([]);
   useEffect(() => {
     api
       .getUserInfo()
@@ -32,7 +28,7 @@ function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(
     false
   );
-  const [selectedCard, setSelectedCard] = React.useState(false);
+  const [selectedCard, setSelectedCard] = React.useState(null);
 
   function handleCardClick(url) {
     setSelectedCard(url);
@@ -60,9 +56,9 @@ function App() {
       .editAvatar(avatarUrl)
       .then((dataUser) => {
         setCurrentUser(dataUser);
+        closeAllPopups();
       })
       .catch((err) => console.log(err));
-    closeAllPopups();
   }
   function handleUpdateUser(dataUser) {
     console.log(dataUser);
@@ -70,9 +66,9 @@ function App() {
       .renameUser(dataUser.name, dataUser.about)
       .then((dataUser) => {
         setCurrentUser(dataUser);
+        closeAllPopups();
       })
       .catch((err) => console.log(err));
-    closeAllPopups();
   }
 
   const [cards, setCards] = useState([]);
@@ -91,9 +87,9 @@ function App() {
       .addCard(dataNewCard)
       .then((newCard) => {
         setCards([newCard, ...cards]);
+        closeAllPopups();
       })
       .catch((err) => console.log(err));
-      closeAllPopups();
   }
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
@@ -115,6 +111,7 @@ function App() {
       })
       .catch((err) => console.log(err));
   }
+
 
   return (
     <currentUserContext.Provider value={currentUser}>
