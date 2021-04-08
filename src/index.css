@@ -10,4 +10,6 @@
 @import url(./blocks/popup/popup.css);
 @import url(./blocks/popup-add-card/popup-add-card.css);
 @import url(./blocks/big-image/big-image.css);
+@import url(./blocks/user-auth/user-auth.css);
+@import url(./blocks/Info-tooltip/Info-tooltip.css);
 

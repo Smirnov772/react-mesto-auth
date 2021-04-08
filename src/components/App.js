@@ -2,13 +2,18 @@ import React, { useEffect, useState } from "react";
 import Footer from "./Footer";
 import Main from "./Main";
 import Header from "./Header";
-
+import { Route, Switch, Redirect, useHistory } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
 import ImagePopup from "./ImagePopup";
 import api from "../utils/api";
 import { currentUserContext } from "../contexts/CurrentUserContext";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
+import Login from "./Login";
+import Register from "./Register";
+import InfoTooltip from "./InfoTooltip";
+import authLogoOk from "../images/authLogoOk.svg";
 
 function App() {
   const [currentUser, setCurrentUser] = useState({
@@ -24,6 +29,18 @@ function App() {
       })
       .catch((err) => console.log(err));
   }, []);
+
+  // const [loggedIn, setLoggedIn] = useState({
+  //   loggedIn: true,
+  // });
+const loggedIn = false
+  // const history = useHistory();
+
+  // useEffect(() => {
+  //   if (loggedIn) {
+  //     history.push("/main");
+  //   }
+  // }, [loggedIn]);
 
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(
     false
@@ -93,7 +110,7 @@ function App() {
         setCards([newCard, ...cards]);
       })
       .catch((err) => console.log(err));
-      closeAllPopups();
+    closeAllPopups();
   }
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
@@ -122,15 +139,29 @@ function App() {
       <div>
         <div className="page__content">
           <Header />
-          <Main
-            onEditAvatar={handleEditAvatarClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditProfile={handleEditProfileClick}
-            onCardClick={handleCardClick}
-            cards={cards}
-            onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
-          />
+          <Switch>
+            <ProtectedRoute
+              path="/main"
+              loggedIn={loggedIn}
+              component={Main}
+              onEditAvatar={handleEditAvatarClick}
+              onAddPlace={handleAddPlaceClick}
+              onEditProfile={handleEditProfileClick}
+              onCardClick={handleCardClick}
+              cards={cards}
+              onCardLike={handleCardLike}
+              onCardDelete={handleCardDelete}
+            />
+            <Route path="/sign-in">
+              <Login></Login>
+            </Route>
+            <Route path="/sign-up">
+              <Register />
+            </Route>
+            <Route path="/">
+              {loggedIn ? <Redirect to="/main" /> : <Redirect to="/sign-in" />}
+            </Route>
+          </Switch>
 
           <Footer />
         </div>
@@ -149,6 +180,11 @@ function App() {
           isOpen={isAddPlacePopupOpen}
           onClose={closeAllPopups}
           onAddPlace={handleAddPlaceSubmit}
+        />
+        <InfoTooltip
+          isOpen={isAddPlacePopupOpen}
+          onClose={closeAllPopups}
+          logo={authLogoOk}
         />
       </div>
     </currentUserContext.Provider>
