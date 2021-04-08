@@ -2,7 +2,7 @@ import React from "react";
 import PopupWithForm from "./PopupWithForm";
 
 function EditAvatarPopup(props) {
-  const avatarRef = React.useRef(null);
+  const avatarRef = React.useRef(0);
 
   function handleSubmit(e) {
     e.preventDefault();
