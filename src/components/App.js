@@ -24,7 +24,7 @@ function App() {
   });
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState([]);
-
+  console.log(userData);
   useEffect(() => {
     api
       .getUserInfo()
@@ -35,55 +35,54 @@ function App() {
   }, []);
 
   useEffect(() => {
-    tokenCheck();
+    checkToken();
   }, []);
 
   useEffect(() => {
     if (loggedIn) {
       history.push("/main");
     }
-  
   }, [loggedIn]);
 
-  function tokenCheck() {
+  function checkToken() {
     const jwt = localStorage.getItem("jwt");
     if (jwt) {
       apiAuth.JWTValid(jwt).then((res) => {
+        setUserData({ ...userData, email: res.data.email });
         setLoggedIn(true);
-        setUserData(res.data.email);
       });
     }
   }
-  function userRegister(userData) {
+  function userRegister(input) {
     apiAuth
-      .register(userData.password, userData.email)
+      .register(input.password, input.email)
       .then((res) => {
-        setIsInfoTooltipOpen(true);
-
-        setLoggedIn(true);
-        history.push("/main");
-
+        history.push("/sign-in");
+        setIsInfoTooltipStatus(true);
         return;
       })
       .catch((err) => {
+        setIsInfoTooltipStatus(false);
         console.log(err);
-        setIsInfoTooltipOpen(true);
       });
+    setIsInfoTooltipOpen(true);
   }
 
-  function userAuthorize(userData) {
+  function userAuthorize(input) {
     apiAuth
-      .authorize(userData.password, userData.email)
+      .authorize(input.password, input.email)
       .then((data) => {
-        setLoggedIn(true);
         localStorage.setItem("jwt", data.token);
+        setLoggedIn(true);
         history.push("/main");
-        
+        setUserData({ ...userData, email: input.email });
         console.log(`then ${data.token}`);
+
         return;
       })
       .catch((err) => {
         console.log(err);
+        setIsInfoTooltipStatus(false);
         setIsInfoTooltipOpen(true);
       });
   }
@@ -93,6 +92,8 @@ function App() {
     setLoggedIn(false);
     setUserData("");
   }
+
+  const [isInfoTooltipStatus, setIsInfoTooltipStatus] = React.useState(false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(
     false
@@ -195,7 +196,7 @@ function App() {
           <Header
             loggedIn={loggedIn}
             loggedOut={userRemove}
-            userData={userData}
+            userData={userData.email}
           />
           <Switch>
             <Route path="/sign-in">
@@ -240,7 +241,7 @@ function App() {
           onAddPlace={handleAddPlaceSubmit}
         />
         <InfoTooltip
-          loggedIn={loggedIn}
+          loggedIn={isInfoTooltipStatus}
           isOpen={isInfoTooltipOpen}
           onClose={closeAllPopups}
         />
