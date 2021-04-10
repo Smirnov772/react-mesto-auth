@@ -6,6 +6,7 @@ import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import ImagePopup from "./ImagePopup";
 import api from "../utils/api";
+import apiAuth from "../utils/apiAuth";
 import { currentUserContext } from "../contexts/CurrentUserContext";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
@@ -13,14 +14,17 @@ import AddPlacePopup from "./AddPlacePopup";
 import Login from "./Login";
 import Register from "./Register";
 import InfoTooltip from "./InfoTooltip";
-import authLogoOk from "../images/authLogoOk.svg";
 
 function App() {
+  const history = useHistory();
   const [currentUser, setCurrentUser] = useState({
     name: "Жак Ив Кусто",
     about: "Иследователь океана",
     avatar: "#",
   });
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userData, setUserData] = useState([]);
+
   useEffect(() => {
     api
       .getUserInfo()
@@ -30,18 +34,66 @@ function App() {
       .catch((err) => console.log(err));
   }, []);
 
-  // const [loggedIn, setLoggedIn] = useState({
-  //   loggedIn: true,
-  // });
-const loggedIn = false
-  // const history = useHistory();
+  useEffect(() => {
+    tokenCheck();
+  }, []);
 
-  // useEffect(() => {
-  //   if (loggedIn) {
-  //     history.push("/main");
-  //   }
-  // }, [loggedIn]);
+  useEffect(() => {
+    if (loggedIn) {
+      history.push("/main");
+    }
+  
+  }, [loggedIn]);
 
+  function tokenCheck() {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      apiAuth.JWTValid(jwt).then((res) => {
+        setLoggedIn(true);
+        setUserData(res.data.email);
+      });
+    }
+  }
+  function userRegister(userData) {
+    apiAuth
+      .register(userData.password, userData.email)
+      .then((res) => {
+        setIsInfoTooltipOpen(true);
+
+        setLoggedIn(true);
+        history.push("/main");
+
+        return;
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsInfoTooltipOpen(true);
+      });
+  }
+
+  function userAuthorize(userData) {
+    apiAuth
+      .authorize(userData.password, userData.email)
+      .then((data) => {
+        setLoggedIn(true);
+        localStorage.setItem("jwt", data.token);
+        history.push("/main");
+        
+        console.log(`then ${data.token}`);
+        return;
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsInfoTooltipOpen(true);
+      });
+  }
+  function userRemove() {
+    localStorage.removeItem("jwt");
+    history.push("/sign-in");
+    setLoggedIn(false);
+    setUserData("");
+  }
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(
     false
   );
@@ -55,6 +107,7 @@ const loggedIn = false
     setSelectedCard(url);
     console.log(url);
   }
+
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
   }
@@ -69,6 +122,7 @@ const loggedIn = false
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setSelectedCard(false);
+    setIsInfoTooltipOpen(false);
     console.log(true);
   }
   function handleUpdateAvatar(avatarUrl) {
@@ -138,8 +192,18 @@ const loggedIn = false
       {" "}
       <div>
         <div className="page__content">
-          <Header />
+          <Header
+            loggedIn={loggedIn}
+            loggedOut={userRemove}
+            userData={userData}
+          />
           <Switch>
+            <Route path="/sign-in">
+              <Login onSubmit={userAuthorize} />
+            </Route>
+            <Route path="/sign-up">
+              <Register onSubmit={userRegister} />
+            </Route>
             <ProtectedRoute
               path="/main"
               loggedIn={loggedIn}
@@ -152,13 +216,7 @@ const loggedIn = false
               onCardLike={handleCardLike}
               onCardDelete={handleCardDelete}
             />
-            <Route path="/sign-in">
-              <Login></Login>
-            </Route>
-            <Route path="/sign-up">
-              <Register />
-            </Route>
-            <Route path="/">
+            <Route exact path="/">
               {loggedIn ? <Redirect to="/main" /> : <Redirect to="/sign-in" />}
             </Route>
           </Switch>
@@ -182,9 +240,9 @@ const loggedIn = false
           onAddPlace={handleAddPlaceSubmit}
         />
         <InfoTooltip
-          isOpen={isAddPlacePopupOpen}
+          loggedIn={loggedIn}
+          isOpen={isInfoTooltipOpen}
           onClose={closeAllPopups}
-          logo={authLogoOk}
         />
       </div>
     </currentUserContext.Provider>

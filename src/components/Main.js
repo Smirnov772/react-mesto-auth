@@ -4,6 +4,7 @@ import { currentUserContext } from "../contexts/CurrentUserContext";
 import Card from "../components/Card";
 function Main(props) {
   const currentUser = React.useContext(currentUserContext);
+  
 
   const handleCardClick = (url) => {
     props.onCardClick(url);
@@ -16,6 +17,7 @@ function Main(props) {
           className="profile__avatar"
           style={{ backgroundImage: `url(${currentUser.avatar})` }}
         >
+          
           <button
             className="profile__avatar-pencil"
             onClick={props.onEditAvatar}
